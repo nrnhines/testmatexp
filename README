@@ -1,0 +1,18 @@
+Test of matexp method
+
+Build and install NEURON with
+cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=install -DNRN_ENABLE_CORENEURON=ON -DNRN_ENABLE_TESTS=ON -DNRN_ENABLE_DOCS=ON
+ninja install
+
+Or
+pip install neuron-nightly # assuming PR #3574 merged to master
+
+
+export NMODLHOME=$N # where NEURON was installed
+#look at output of nrnpyenv.sh and note NRN_PYLIB
+export NMODL_PYLIB=$NRN_PYLIB
+
+# in this folder
+nrnivmodl -nmodl `which nmodl`
+
+python -i test1.py
