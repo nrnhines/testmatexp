@@ -102,14 +102,14 @@ KINETIC states {
     ~ m0h0 <-> m0h1 (1*ah, 1*bh)
     ~ m1h0 <-> m1h1 (1*ah, 1*bh)
     ~ m2h0 <-> m2h1 (1*ah, 1*bh)
-    ~ m3h0 <-> m3h1 (1*an, 1*bh)
+    ~ m3h0 <-> m3h1 (1*ah, 1*bh)
     CONSERVE m0h0+m1h0+m2h0+m3h0+m0h1+m1h1+m2h1+m3h1 = 1
 
     : potassium gate
-    ~ n0 <-> n1 (1*an, 4*bn)
-    ~ n1 <-> n2 (2*an, 3*bn)
-    ~ n2 <-> n3 (3*an, 2*bn)
-    ~ n3 <-> n4 (4*an, 1*bn)
+    ~ n0 <-> n1 (4*an, 1*bn)
+    ~ n1 <-> n2 (3*an, 2*bn)
+    ~ n2 <-> n3 (2*an, 3*bn)
+    ~ n3 <-> n4 (1*an, 4*bn)
     CONSERVE n0 + n1 + n2 + n3 + n4 = 1
 }
  
