@@ -1,5 +1,20 @@
 from neuron import h, gui
 
+"""
+verify identity of hh and hhmatexp
+and voltage clamp result independence on dt.
+The "tricks" used for dt independence are
+1) use ideal voltage clamp (implemented from LinearCircuitBuilder) with
+   step discontinuity from -65mv to -10 mv at 1ms
+2) Force voltage change to -10mv with cvode event at 1ms
+   Otherwise, for the fixed step method, the voltage change will affect the
+   model on the following step
+3) Use fcurrent() before evaluating gna and gk.
+   Otherwise gna and gk will have been evaluated using voltage at t-dt/2 and
+   gating states at t+dt/2
+4) Implied by 3), do not use Vector.record to evaluate gna and gk
+"""
+
 h("create soma")
 h.soma.L = 10
 h.soma.diam = 10
@@ -9,30 +24,12 @@ h.soma.insert("hhmatexp")
 
 h.load_file("test1.ses")  # LINEAR CIRCUIT ideal voltage clamp
 
+if 0:
+    h.usetable_hh = 0
+    h.usetable_hhkin = 0
+    h.usetable_hhmatexp = 0
+
 print(f" usetable {h.usetable_hh} {h.usetable_hhkin} {h.usetable_hhmatexp}")
-
-"""
-h.usetable_hh = 0
-h.usetable_hhkin = 0
-h.usetable_hhmatexp = 0
-"""
-hhmat = h.soma(0.5).hhmatexp
-hhkin = h.soma(0.5).hhkin
-hh = h.soma(0.5).hh
-
-vecs = [
-    h.Vector().record(x, 1.0, sec=h.soma)
-    for x in [h._ref_t, h.soma(0.5)._ref_v, hh._ref_n, hhkin._ref_n4, hhmat._ref_n4]
-]
-
-
-def pvecs(vecs):
-    n = vecs[0].size()
-    for i in range(n):
-        for j, vec in enumerate(vecs):
-            z = vec[i] if j != 2 else vec[i] ** 4
-            print(f"{z}", end="  ")
-        print()
 
 
 def prval():
@@ -56,7 +53,8 @@ def run(i):
     h.steps_per_ms = i
     h.dt = 1.0 / h.steps_per_ms
     h.stdinit()
-    h.cvode.event(1.0, discon)
+    if h.cvode_active() == 0.0:
+        h.cvode.event(1.0, discon)
     print(f"steps_per_ms={h.steps_per_ms}  dt={h.dt}")
     prval()
     for x in range(5):
@@ -65,5 +63,6 @@ def run(i):
         prval()
 
 
+# h.cvode_active(1)  # KINETIC appears not to work when translated by nmodl
 run(1)
 run(64)
